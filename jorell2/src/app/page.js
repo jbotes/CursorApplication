@@ -49,6 +49,18 @@ export default function Home() {
           >
             Read our docs
           </a>
+          <button
+            className="rounded-full bg-white text-black border border-solid border-black/[.08] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
+          >
+            <Image
+              src="/key.svg"
+              alt="Key icon"
+              width={16}
+              height={16}
+              className="mr-2"
+            />
+            Go to API Keys
+          </button>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
