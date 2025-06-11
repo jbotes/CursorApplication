@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -49,7 +50,8 @@ export default function Home() {
           >
             Read our docs
           </a>
-          <button
+          <Link
+            href="/api-keys"
             className="rounded-full bg-white text-black border border-solid border-black/[.08] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
           >
             <Image
@@ -60,7 +62,7 @@ export default function Home() {
               className="mr-2"
             />
             Go to API Keys
-          </button>
+          </Link>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
