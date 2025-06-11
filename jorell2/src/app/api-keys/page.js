@@ -7,12 +7,19 @@ export default function APIKeysPage() {
         <h1 className="text-4xl font-bold text-center sm:text-left">
           Welcome to the API Keys Page
         </h1>
-        <Link
-          href="/"
-          className="rounded-full bg-red-600 text-white border border-solid border-transparent transition-colors flex items-center justify-center hover:bg-red-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-auto"
-        >
-          Take me Back!
-        </Link>
+        <div className="flex gap-4 items-center flex-col sm:flex-row">
+          <Link
+            href="/"
+            className="rounded-full bg-red-600 text-white border border-solid border-transparent transition-colors flex items-center justify-center hover:bg-red-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-auto"
+          >
+            Take me Back!
+          </Link>
+          <button
+            className="rounded-full bg-blue-600 text-white border border-solid border-transparent transition-colors flex items-center justify-center hover:bg-blue-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-auto"
+          >
+            Create new API Key
+          </button>
+        </div>
       </main>
     </div>
   );
