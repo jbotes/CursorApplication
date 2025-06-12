@@ -14,6 +14,26 @@ export default function APIKeysPage() {
   const [createError, setCreateError] = useState("");
   const [monthlyLimit, setMonthlyLimit] = useState(1000);
   const [hasLimit, setHasLimit] = useState(false);
+  const [visibleKeys, setVisibleKeys] = useState(new Set());
+
+  // Function to mask API key
+  const maskApiKey = (key) => {
+    if (visibleKeys.has(key.id)) {
+      return key.key;
+    }
+    return key.key.slice(0, -5) + '*****';
+  };
+
+  // Function to toggle key visibility
+  const toggleKeyVisibility = (keyId) => {
+    const newVisibleKeys = new Set(visibleKeys);
+    if (newVisibleKeys.has(keyId)) {
+      newVisibleKeys.delete(keyId);
+    } else {
+      newVisibleKeys.add(keyId);
+    }
+    setVisibleKeys(newVisibleKeys);
+  };
 
   // Mock functions for CRUD operations - replace with actual API calls
   const createApiKey = () => {
@@ -236,9 +256,18 @@ export default function APIKeysPage() {
                       </div>
                     </td>
                     <td className="py-3 px-4">
-                      <code className="text-sm text-red-600 font-mono bg-gray-50 px-2 py-1 rounded">{key.key}</code>
+                      <code className="text-sm text-red-600 font-mono bg-gray-50 px-2 py-1 rounded">
+                        {maskApiKey(key)}
+                      </code>
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
+                      <button
+                        className="text-gray-400 hover:text-gray-600"
+                        title={visibleKeys.has(key.id) ? "Hide API Key" : "Show API Key"}
+                        onClick={() => toggleKeyVisibility(key.id)}
+                      >
+                        {visibleKeys.has(key.id) ? '👁️' : '👁️‍🗨️'}
+                      </button>
                       <button
                         className="text-gray-400 hover:text-gray-600"
                         title="Copy"
