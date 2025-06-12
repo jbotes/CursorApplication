@@ -104,187 +104,203 @@ export default function APIKeysPage() {
   };
 
   return (
-    <div className="min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] items-center sm:items-start max-w-6xl mx-auto">
-        <div className="w-full flex justify-between items-center">
-          <h1 className="text-4xl font-bold">API Keys</h1>
-          <div className="flex gap-4">
-            <Link
-              href="/"
-              className="rounded-full bg-gray-600 text-white border border-solid border-transparent transition-colors flex items-center justify-center hover:bg-gray-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            >
-              Back
-            </Link>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="rounded-full bg-blue-600 text-white border border-solid border-transparent transition-colors flex items-center justify-center hover:bg-blue-700 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            >
-              Create new API Key
-            </button>
-          </div>
-        </div>
-
-        {/* Search Box */}
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Type here..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-          />
-        </div>
-
-        {/* API Keys Table */}
-        <div className="w-full overflow-x-auto bg-white rounded-lg shadow">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">API Key</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Used</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {apiKeys.map((key) => (
-                <tr key={key.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {editingKey === key.id ? (
-                      <div className="flex flex-col gap-1">
-                        <input
-                          type="text"
-                          className={`border rounded px-2 py-1 w-full ${
-                            editError ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          value={editingName}
-                          onChange={(e) => {
-                            setEditingName(e.target.value);
-                            setEditError("");
-                          }}
-                          onKeyDown={(e) => handleEditKeyPress(e, key.id)}
-                          autoFocus
-                        />
-                        {editError && (
-                          <span className="text-xs text-red-600">{editError}</span>
-                        )}
-                        <div className="flex gap-2 mt-1">
-                          <button
-                            onClick={() => updateApiKey(key.id)}
-                            className="text-xs text-green-600 hover:text-green-800"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={cancelEditing}
-                            className="text-xs text-gray-600 hover:text-gray-800"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-sm text-gray-900">{key.name}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <code className="text-sm bg-gray-100 px-2 py-1 rounded text-red-600 font-medium">{key.key}</code>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(key.created).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {key.lastUsed ? new Date(key.lastUsed).toLocaleDateString() : "Never"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {editingKey === key.id ? (
-                      <span className="text-gray-400">Editing...</span>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => startEditing(key)}
-                          className="text-indigo-600 hover:text-indigo-900 mr-4"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => deleteApiKey(key.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
-              {apiKeys.length === 0 && (
-                <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                    No API keys found. Create one to get started.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Create API Key Modal */}
-        {isCreateModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Create New API Key</h2>
-                <button
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
+    <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Header Card with Gradient */}
+      <div className="bg-gradient-to-br from-purple-600 via-purple-400 to-blue-400 p-8 rounded-b-3xl shadow-lg">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <div className="text-white/80 text-sm font-medium mb-2">CURRENT PLAN</div>
+            <h1 className="text-4xl font-bold text-white mb-8">Researcher</h1>
+            
+            {/* API Limit Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-white/90 text-sm">API Limit</span>
+                <span className="text-white/60 text-lg">ⓘ</span>
               </div>
-              <div className="mb-4">
-                <label htmlFor="keyName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Key Name
-                </label>
-                <input
-                  id="keyName"
-                  type="text"
-                  placeholder="Enter key name"
-                  className={`w-full border rounded px-3 py-2 ${
-                    createError ? 'border-red-500' : 'border-gray-300'
-                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all`}
-                  value={newKeyName}
-                  onChange={(e) => {
-                    setNewKeyName(e.target.value);
-                    setCreateError(""); // Clear error when user types
-                  }}
-                  onKeyDown={handleCreateKeyPress}
-                  autoFocus
-                />
-                {createError && (
-                  <p className="mt-1 text-sm text-red-600">{createError}</p>
-                )}
+              <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                <div className="h-full w-[10%] bg-white rounded-full"></div>
               </div>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={createApiKey}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!newKeyName.trim()}
-                >
-                  Create
-                </button>
-              </div>
+              <div className="text-white/80 text-sm">24/1,000 Requests</div>
             </div>
           </div>
-        )}
+        </div>
+      </div>
+
+      <main className="max-w-6xl mx-auto px-8 -mt-8">
+        {/* API Keys Section */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">API Keys</h2>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              <span>+</span>
+              <span>New API Key</span>
+            </button>
+          </div>
+
+          <p className="text-gray-600 text-sm mb-6">
+            The key is used to authenticate your requests to the Research API. 
+            To learn more, see the documentation page.
+          </p>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">NAME</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">USAGE</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">KEY</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">OPTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {apiKeys.map((key) => (
+                  <tr key={key.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                    <td className="py-3 px-4">
+                      {editingKey === key.id ? (
+                        <div className="flex flex-col gap-1">
+                          <input
+                            type="text"
+                            className={`border rounded px-3 py-1.5 w-full text-sm ${
+                              editError ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            value={editingName}
+                            onChange={(e) => {
+                              setEditingName(e.target.value);
+                              setEditError("");
+                            }}
+                            onKeyDown={(e) => handleEditKeyPress(e, key.id)}
+                            autoFocus
+                          />
+                          {editError && (
+                            <span className="text-xs text-red-600">{editError}</span>
+                          )}
+                          <div className="flex gap-2 mt-1">
+                            <button
+                              onClick={() => updateApiKey(key.id)}
+                              className="text-xs text-green-600 hover:text-green-800"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelEditing}
+                              className="text-xs text-gray-600 hover:text-gray-800"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-gray-900 font-medium">{key.name}</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="text-sm text-gray-600">0</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <code className="text-sm text-red-600 font-mono bg-gray-50 px-2 py-1 rounded">{key.key}</code>
+                    </td>
+                    <td className="py-3 px-4 text-right space-x-2">
+                      <button
+                        className="text-gray-400 hover:text-gray-600"
+                        title="Copy"
+                      >
+                        📋
+                      </button>
+                      {editingKey === key.id ? (
+                        <span className="text-sm text-gray-400">Editing...</span>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => startEditing(key)}
+                            className="text-gray-400 hover:text-gray-600"
+                            title="Edit"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => deleteApiKey(key.id)}
+                            className="text-gray-400 hover:text-gray-600"
+                            title="Delete"
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {apiKeys.length === 0 && (
+                  <tr>
+                    <td colSpan="4" className="px-4 py-8 text-center text-gray-500">
+                      No API keys found. Create one to get started.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
+
+      {/* Create Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Create New API Key</h2>
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="keyName" className="block text-sm font-medium text-gray-700 mb-1">
+                Key Name
+              </label>
+              <input
+                id="keyName"
+                type="text"
+                placeholder="Enter key name"
+                className={`w-full border rounded-lg px-3 py-2 ${
+                  createError ? 'border-red-500' : 'border-gray-300'
+                } focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition-all`}
+                value={newKeyName}
+                onChange={(e) => {
+                  setNewKeyName(e.target.value);
+                  setCreateError("");
+                }}
+                onKeyDown={handleCreateKeyPress}
+                autoFocus
+              />
+              {createError && (
+                <p className="mt-1 text-sm text-red-600">{createError}</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createApiKey}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!newKeyName.trim()}
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
