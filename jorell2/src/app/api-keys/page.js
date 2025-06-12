@@ -38,10 +38,14 @@ export default function APIKeysPage() {
         name: newKeyName.trim(),
         key: `key_${Math.random().toString(36).substr(2, 9)}`,
         created: new Date().toISOString(),
-        lastUsed: null
+        lastUsed: null,
+        monthlyLimit: hasLimit ? monthlyLimit : null,
+        currentUsage: 0
       };
       setApiKeys([...apiKeys, newKey]);
       setNewKeyName("");
+      setMonthlyLimit(1000);
+      setHasLimit(false);
       setIsCreateModalOpen(false);
     } catch (error) {
       setCreateError("Failed to create API key. Please try again.");
@@ -222,7 +226,14 @@ export default function APIKeysPage() {
                       )}
                     </td>
                     <td className="py-3 px-4">
-                      <span className="text-sm text-gray-600">0</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-gray-900">{key.currentUsage || 0}</span>
+                        {key.monthlyLimit && (
+                          <span className="text-xs text-gray-500">
+                            Limit: {key.monthlyLimit}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3 px-4">
                       <code className="text-sm text-red-600 font-mono bg-gray-50 px-2 py-1 rounded">{key.key}</code>
@@ -231,6 +242,9 @@ export default function APIKeysPage() {
                       <button
                         className="text-gray-400 hover:text-gray-600"
                         title="Copy"
+                        onClick={() => {
+                          navigator.clipboard.writeText(key.key);
+                        }}
                       >
                         📋
                       </button>
