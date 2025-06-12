@@ -9,20 +9,47 @@ export default function APIKeysPage() {
   const [newKeyName, setNewKeyName] = useState("");
   const [editingKey, setEditingKey] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [createError, setCreateError] = useState("");
 
   // Mock functions for CRUD operations - replace with actual API calls
   const createApiKey = () => {
-    if (!newKeyName.trim()) return;
-    const newKey = {
-      id: Date.now(),
-      name: newKeyName,
-      key: `key_${Math.random().toString(36).substr(2, 9)}`,
-      created: new Date().toISOString(),
-      lastUsed: null
-    };
-    setApiKeys([...apiKeys, newKey]);
-    setNewKeyName("");
-    setIsCreateModalOpen(false);
+    // Reset error state
+    setCreateError("");
+
+    // Validate input
+    if (!newKeyName.trim()) {
+      setCreateError("Please enter a key name");
+      return;
+    }
+
+    // Check for duplicate names
+    if (apiKeys.some(key => key.name.toLowerCase() === newKeyName.trim().toLowerCase())) {
+      setCreateError("An API key with this name already exists");
+      return;
+    }
+
+    try {
+      const newKey = {
+        id: Date.now(),
+        name: newKeyName.trim(),
+        key: `key_${Math.random().toString(36).substr(2, 9)}`,
+        created: new Date().toISOString(),
+        lastUsed: null
+      };
+      setApiKeys([...apiKeys, newKey]);
+      setNewKeyName("");
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      setCreateError("Failed to create API key. Please try again.");
+    }
+  };
+
+  const handleCreateKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      createApiKey();
+    } else if (e.key === 'Escape') {
+      setIsCreateModalOpen(false);
+    }
   };
 
   const deleteApiKey = (id) => {
@@ -97,7 +124,7 @@ export default function APIKeysPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <code className="text-sm bg-gray-100 px-2 py-1 rounded">{key.key}</code>
+                    <code className="text-sm bg-gray-100 px-2 py-1 rounded text-red-600 font-medium">{key.key}</code>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(key.created).toLocaleDateString()}
@@ -136,14 +163,38 @@ export default function APIKeysPage() {
         {isCreateModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">Create New API Key</h2>
-              <input
-                type="text"
-                placeholder="Enter key name"
-                className="w-full border rounded px-3 py-2 mb-4"
-                value={newKeyName}
-                onChange={(e) => setNewKeyName(e.target.value)}
-              />
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">Create New API Key</h2>
+                <button
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="keyName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Key Name
+                </label>
+                <input
+                  id="keyName"
+                  type="text"
+                  placeholder="Enter key name"
+                  className={`w-full border rounded px-3 py-2 ${
+                    createError ? 'border-red-500' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all`}
+                  value={newKeyName}
+                  onChange={(e) => {
+                    setNewKeyName(e.target.value);
+                    setCreateError(""); // Clear error when user types
+                  }}
+                  onKeyDown={handleCreateKeyPress}
+                  autoFocus
+                />
+                {createError && (
+                  <p className="mt-1 text-sm text-red-600">{createError}</p>
+                )}
+              </div>
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => setIsCreateModalOpen(false)}
@@ -153,7 +204,8 @@ export default function APIKeysPage() {
                 </button>
                 <button
                   onClick={createApiKey}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!newKeyName.trim()}
                 >
                   Create
                 </button>
