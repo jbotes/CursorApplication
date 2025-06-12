@@ -8,6 +8,7 @@ export default function APIKeysPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [editingKey, setEditingKey] = useState(null);
+  const [searchText, setSearchText] = useState("");
 
   // Mock functions for CRUD operations - replace with actual API calls
   const createApiKey = () => {
@@ -54,6 +55,17 @@ export default function APIKeysPage() {
               Create new API Key
             </button>
           </div>
+        </div>
+
+        {/* Search Box */}
+        <div className="w-full">
+          <input
+            type="text"
+            placeholder="Type here..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+          />
         </div>
 
         {/* API Keys Table */}
