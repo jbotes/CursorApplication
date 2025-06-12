@@ -8,6 +8,8 @@ export default function APIKeysPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [editingKey, setEditingKey] = useState(null);
+  const [editingName, setEditingName] = useState("");
+  const [editError, setEditError] = useState("");
   const [searchText, setSearchText] = useState("");
   const [createError, setCreateError] = useState("");
 
@@ -56,11 +58,49 @@ export default function APIKeysPage() {
     setApiKeys(apiKeys.filter(key => key.id !== id));
   };
 
-  const updateApiKey = (id, newName) => {
-    setApiKeys(apiKeys.map(key => 
-      key.id === id ? { ...key, name: newName } : key
-    ));
+  const startEditing = (key) => {
+    setEditingKey(key.id);
+    setEditingName(key.name);
+    setEditError("");
+  };
+
+  const cancelEditing = () => {
     setEditingKey(null);
+    setEditingName("");
+    setEditError("");
+  };
+
+  const updateApiKey = (id) => {
+    // Validate input
+    if (!editingName.trim()) {
+      setEditError("Name cannot be empty");
+      return;
+    }
+
+    // Check for duplicate names
+    if (apiKeys.some(key => key.id !== id && key.name.toLowerCase() === editingName.trim().toLowerCase())) {
+      setEditError("An API key with this name already exists");
+      return;
+    }
+
+    try {
+      setApiKeys(apiKeys.map(key => 
+        key.id === id ? { ...key, name: editingName.trim() } : key
+      ));
+      setEditingKey(null);
+      setEditingName("");
+      setEditError("");
+    } catch (error) {
+      setEditError("Failed to update API key. Please try again.");
+    }
+  };
+
+  const handleEditKeyPress = (e, id) => {
+    if (e.key === 'Enter') {
+      updateApiKey(id);
+    } else if (e.key === 'Escape') {
+      cancelEditing();
+    }
   };
 
   return (
@@ -112,13 +152,38 @@ export default function APIKeysPage() {
                 <tr key={key.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {editingKey === key.id ? (
-                      <input
-                        type="text"
-                        className="border rounded px-2 py-1"
-                        defaultValue={key.name}
-                        onBlur={(e) => updateApiKey(key.id, e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && updateApiKey(key.id, e.target.value)}
-                      />
+                      <div className="flex flex-col gap-1">
+                        <input
+                          type="text"
+                          className={`border rounded px-2 py-1 w-full ${
+                            editError ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          value={editingName}
+                          onChange={(e) => {
+                            setEditingName(e.target.value);
+                            setEditError("");
+                          }}
+                          onKeyDown={(e) => handleEditKeyPress(e, key.id)}
+                          autoFocus
+                        />
+                        {editError && (
+                          <span className="text-xs text-red-600">{editError}</span>
+                        )}
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => updateApiKey(key.id)}
+                            className="text-xs text-green-600 hover:text-green-800"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={cancelEditing}
+                            className="text-xs text-gray-600 hover:text-gray-800"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
                     ) : (
                       <span className="text-sm text-gray-900">{key.name}</span>
                     )}
@@ -133,18 +198,24 @@ export default function APIKeysPage() {
                     {key.lastUsed ? new Date(key.lastUsed).toLocaleDateString() : "Never"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => setEditingKey(key.id)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => deleteApiKey(key.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      Delete
-                    </button>
+                    {editingKey === key.id ? (
+                      <span className="text-gray-400">Editing...</span>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => startEditing(key)}
+                          className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteApiKey(key.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
