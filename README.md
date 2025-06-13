@@ -10,3 +10,6 @@ https://docs.cursor.com/context/rules
 
 For the Cursor Prompts you can find here
 https://cursor.directory/
+
+Supabase DB passwo4rd
+DNPxqlAWZipPd4op
