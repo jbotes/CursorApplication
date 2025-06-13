@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from '@/lib/supabase';
 
 export default function APIKeysPage() {
   const [apiKeys, setApiKeys] = useState([]);
@@ -15,6 +16,28 @@ export default function APIKeysPage() {
   const [monthlyLimit, setMonthlyLimit] = useState(1000);
   const [hasLimit, setHasLimit] = useState(false);
   const [visibleKeys, setVisibleKeys] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch API keys on component mount
+  useEffect(() => {
+    fetchApiKeys();
+  }, []);
+
+  const fetchApiKeys = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setApiKeys(data || []);
+    } catch (error) {
+      console.error('Error fetching API keys:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Function to mask API key
   const maskApiKey = (key) => {
@@ -35,40 +58,85 @@ export default function APIKeysPage() {
     setVisibleKeys(newVisibleKeys);
   };
 
-  // Mock functions for CRUD operations - replace with actual API calls
-  const createApiKey = () => {
-    // Reset error state
+  const createApiKey = async () => {
     setCreateError("");
 
-    // Validate input
     if (!newKeyName.trim()) {
       setCreateError("Please enter a key name");
       return;
     }
 
-    // Check for duplicate names
-    if (apiKeys.some(key => key.name.toLowerCase() === newKeyName.trim().toLowerCase())) {
-      setCreateError("An API key with this name already exists");
-      return;
-    }
-
     try {
       const newKey = {
-        id: Date.now(),
         name: newKeyName.trim(),
         key: `key_${Math.random().toString(36).substr(2, 9)}`,
-        created: new Date().toISOString(),
-        lastUsed: null,
-        monthlyLimit: hasLimit ? monthlyLimit : null,
-        currentUsage: 0
+        monthly_limit: hasLimit ? monthlyLimit : null,
+        current_usage: 0
       };
-      setApiKeys([...apiKeys, newKey]);
+
+      console.log('Attempting to create new key:', newKey); // Debug log
+
+      const { data, error } = await supabase
+        .from('api_keys')
+        .insert([newKey])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error); // Debug log
+        throw error;
+      }
+
+      console.log('Successfully created key:', data); // Debug log
+      setApiKeys([data, ...apiKeys]);
       setNewKeyName("");
       setMonthlyLimit(1000);
       setHasLimit(false);
       setIsCreateModalOpen(false);
     } catch (error) {
-      setCreateError("Failed to create API key. Please try again.");
+      console.error('Detailed error creating API key:', error);
+      setCreateError(error.message || "Failed to create API key. Please try again.");
+    }
+  };
+
+  const deleteApiKey = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setApiKeys(apiKeys.filter(key => key.id !== id));
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+    }
+  };
+
+  const updateApiKey = async (id) => {
+    if (!editingName.trim()) {
+      setEditError("Name cannot be empty");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('api_keys')
+        .update({ name: editingName.trim() })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setApiKeys(apiKeys.map(key => 
+        key.id === id ? { ...key, name: editingName.trim() } : key
+      ));
+      setEditingKey(null);
+      setEditingName("");
+      setEditError("");
+    } catch (error) {
+      console.error('Error updating API key:', error);
+      setEditError("Failed to update API key. Please try again.");
     }
   };
 
@@ -78,10 +146,6 @@ export default function APIKeysPage() {
     } else if (e.key === 'Escape') {
       setIsCreateModalOpen(false);
     }
-  };
-
-  const deleteApiKey = (id) => {
-    setApiKeys(apiKeys.filter(key => key.id !== id));
   };
 
   const startEditing = (key) => {
@@ -94,31 +158,6 @@ export default function APIKeysPage() {
     setEditingKey(null);
     setEditingName("");
     setEditError("");
-  };
-
-  const updateApiKey = (id) => {
-    // Validate input
-    if (!editingName.trim()) {
-      setEditError("Name cannot be empty");
-      return;
-    }
-
-    // Check for duplicate names
-    if (apiKeys.some(key => key.id !== id && key.name.toLowerCase() === editingName.trim().toLowerCase())) {
-      setEditError("An API key with this name already exists");
-      return;
-    }
-
-    try {
-      setApiKeys(apiKeys.map(key => 
-        key.id === id ? { ...key, name: editingName.trim() } : key
-      ));
-      setEditingKey(null);
-      setEditingName("");
-      setEditError("");
-    } catch (error) {
-      setEditError("Failed to update API key. Please try again.");
-    }
   };
 
   const handleEditKeyPress = (e, id) => {
