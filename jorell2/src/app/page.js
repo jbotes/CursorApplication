@@ -1,120 +1,36 @@
 import Image from "next/image";
-import Link from "next/link";
 import Sidebar from "../components/Sidebar";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex-1 grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] bg-[#f5f5f5]">
-        <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-          <Image
-            className="dark:invert"
-            src="/next.svg"
-            alt="Next.js logo"
-            width={180}
-            height={38}
-            priority
-          />
-          <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-            <li className="mb-2 tracking-[-.01em]">
-              Get started by editing{" "}
-              <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-                src/app/page.js
-              </code>
-              .
-            </li>
-            <li className="tracking-[-.01em]">
-              Save and see your changes instantly.
-            </li>
-          </ol>
-
-          <div className="flex gap-4 items-center flex-col sm:flex-row">
-            <a
-              className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Image
-                className="dark:invert"
-                src="/vercel.svg"
-                alt="Vercel logomark"
-                width={20}
-                height={20}
-              />
-              Deploy now
-            </a>
-            <a
-              className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Read our docs
-            </a>
-            <Link
-              href="/api-keys"
-              className="rounded-full bg-white text-black border border-solid border-black/[.08] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto"
-            >
-              <Image
-                src="/key.svg"
-                alt="Key icon"
-                width={16}
-                height={16}
-                className="mr-2"
-              />
-              Go to API Keys
-            </Link>
+      <div className="flex-1 bg-[#f5f5f5]">
+        {/* Header Card with Gradient */}
+        <div className="bg-gradient-to-br from-purple-600 via-purple-400 to-blue-400 p-8 rounded-b-3xl shadow-lg">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-white mb-4">Welcome to BA Sensei Keys</h1>
+              <p className="text-white/80 text-lg max-w-2xl">Easily manage your API keys, monitor usage, and control access for your applications. Use the sidebar to navigate between the main page and your API keys.</p>
+            </div>
+          </div>
+        </div>
+        <main className="max-w-6xl mx-auto px-8 -mt-8">
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+            <div className="flex flex-col gap-4 items-start">
+              <h2 className="text-2xl font-semibold text-gray-800">Get Started</h2>
+              <p className="text-gray-700 text-[15px]">Use the navigation on the left to access your API keys or return to this main page. Here you can find information about your account, usage, and more features coming soon.</p>
+              <div className="flex gap-4 mt-4">
+                <a
+                  className="rounded-lg bg-purple-600 text-white px-5 py-2.5 font-medium hover:bg-purple-700 transition-colors"
+                  href="/api-keys"
+                >
+                  Manage API Keys
+                </a>
+              </div>
+            </div>
           </div>
         </main>
-        <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="/file.svg"
-              alt="File icon"
-              width={16}
-              height={16}
-            />
-            Learn
-          </a>
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="/window.svg"
-              alt="Window icon"
-              width={16}
-              height={16}
-            />
-            Examples
-          </a>
-          <a
-            className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-            href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              aria-hidden
-              src="/globe.svg"
-              alt="Globe icon"
-              width={16}
-              height={16}
-            />
-            Go to nextjs.org →
-          </a>
-        </footer>
       </div>
     </div>
   );
