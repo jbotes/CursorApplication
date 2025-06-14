@@ -18,6 +18,7 @@ export default function APIKeysPage() {
   const [visibleKeys, setVisibleKeys] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
+  const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   // Fetch API keys on component mount
   useEffect(() => {
@@ -110,6 +111,7 @@ export default function APIKeysPage() {
       if (error) throw error;
 
       setApiKeys(apiKeys.filter(key => key.id !== id));
+      triggerDeleteToast();
     } catch (error) {
       console.error('Error deleting API key:', error);
     }
@@ -175,6 +177,12 @@ export default function APIKeysPage() {
     setTimeout(() => setShowToast(false), 2000);
   };
 
+  // Show delete toast for 2 seconds
+  const triggerDeleteToast = () => {
+    setShowDeleteToast(true);
+    setTimeout(() => setShowDeleteToast(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
       {/* Toast Notification */}
@@ -185,6 +193,20 @@ export default function APIKeysPage() {
           <button
             className="ml-2 text-gray-500 hover:text-gray-700 text-lg"
             onClick={() => setShowToast(false)}
+            aria-label="Close notification"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {/* Delete Toast Notification */}
+      {showDeleteToast && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-gray-100 border border-gray-300 text-gray-900 px-6 py-3 rounded-xl shadow flex items-center gap-3 min-w-[280px] max-w-[90vw] mt-16">
+          <span className="text-red-600 text-xl">🗑️</span>
+          <span className="flex-1 text-[15px] font-medium">API Key deleted</span>
+          <button
+            className="ml-2 text-gray-500 hover:text-gray-700 text-lg"
+            onClick={() => setShowDeleteToast(false)}
             aria-label="Close notification"
           >
             ×
