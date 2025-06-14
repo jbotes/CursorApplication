@@ -17,6 +17,7 @@ export default function APIKeysPage() {
   const [hasLimit, setHasLimit] = useState(false);
   const [visibleKeys, setVisibleKeys] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
   // Fetch API keys on component mount
   useEffect(() => {
@@ -168,8 +169,28 @@ export default function APIKeysPage() {
     }
   };
 
+  // Show toast for 2 seconds
+  const triggerToast = () => {
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
+
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-gray-100 border border-gray-300 text-gray-900 px-6 py-3 rounded-xl shadow flex items-center gap-3 min-w-[280px] max-w-[90vw]">
+          <span className="text-green-600 text-xl">✔️</span>
+          <span className="flex-1 text-[15px] font-medium">Copied API Key to clipboard</span>
+          <button
+            className="ml-2 text-gray-500 hover:text-gray-700 text-lg"
+            onClick={() => setShowToast(false)}
+            aria-label="Close notification"
+          >
+            ×
+          </button>
+        </div>
+      )}
       {/* Header Card with Gradient */}
       <div className="bg-gradient-to-br from-purple-600 via-purple-400 to-blue-400 p-8 rounded-b-3xl shadow-lg">
         <div className="max-w-6xl mx-auto">
@@ -312,6 +333,7 @@ export default function APIKeysPage() {
                         title="Copy"
                         onClick={() => {
                           navigator.clipboard.writeText(key.key);
+                          triggerToast();
                         }}
                       >
                         📋
