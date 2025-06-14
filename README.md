@@ -16,3 +16,7 @@ https://supabase.com/dashboard/org/sbxzagilmwcxaysclkix
 
 Supabase DB passwo4rd
 DNPxqlAWZipPd4op
+
+Supabase logon
+jamesbotes@basensei.com
+|GKNwUu2Z=9,JRWx6
