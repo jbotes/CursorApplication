@@ -13,6 +13,8 @@ export default function ApiPlaygroundPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async () => {
+    if (!requestBody.trim()) return;
+    
     setIsLoading(true);
     try {
       // TODO: Implement actual API call
@@ -40,6 +42,8 @@ export default function ApiPlaygroundPage() {
       setIsLoading(false);
     }
   };
+
+  const isButtonDisabled = !requestBody.trim() || isLoading;
 
   return (
     <div className="flex min-h-screen">
@@ -79,16 +83,20 @@ export default function ApiPlaygroundPage() {
                     <textarea
                       value={requestBody}
                       onChange={(e) => setRequestBody(e.target.value)}
-                      className="w-full h-48 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full h-48 p-3 border border-gray-300 rounded-lg font-mono text-sm text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Enter your request body in JSON format..."
                     />
                   </div>
                   <button
                     onClick={handleSubmit}
-                    disabled={isLoading}
-                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    disabled={isButtonDisabled}
+                    className={`w-full py-2 px-4 rounded-lg transition-colors ${
+                      isButtonDisabled
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
                   >
-                    {isLoading ? "Sending Request..." : "Send Request"}
+                    {isLoading ? "Validating..." : "Validate API Key"}
                   </button>
                 </div>
               </div>
