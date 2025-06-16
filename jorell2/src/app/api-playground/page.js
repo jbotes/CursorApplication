@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import { HeaderCard } from "../../components/HeaderCard";
 import { Toast } from "../../components/Toast";
+import { supabase } from '@/lib/supabase';
 
 export default function ApiPlaygroundPage() {
   const [showToast, setShowToast] = useState(false);
@@ -17,29 +18,47 @@ export default function ApiPlaygroundPage() {
     
     setIsLoading(true);
     try {
-      // TODO: Implement actual API call
-      // This is a mock response for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setResponse({
-        status: 200,
-        data: {
-          message: "API call successful",
-          timestamp: new Date().toISOString(),
-        }
-      });
-      setToastMessage("Request completed successfully");
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
+      // Check if the API key exists in the database
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('*')
+        .eq('key', requestBody.trim())
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        // API key found
+        setResponse({
+          status: 200,
+          data: {
+            message: "API Key valid!",
+            key: data.key,
+            name: data.name
+          }
+        });
+        setToastMessage("API Key valid!");
+        setShowToast(true);
+      } else {
+        // API key not found
+        setResponse({
+          status: 404,
+          error: "API Key not valid"
+        });
+        setToastMessage("API Key not valid");
+        setShowToast(true);
+      }
     } catch (error) {
+      console.error('Error validating API key:', error);
       setResponse({
         status: 500,
-        error: "Failed to make API request"
+        error: "Failed to validate API key"
       });
-      setToastMessage("Request failed");
+      setToastMessage("Failed to validate API key");
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
     } finally {
       setIsLoading(false);
+      setTimeout(() => setShowToast(false), 2000);
     }
   };
 
