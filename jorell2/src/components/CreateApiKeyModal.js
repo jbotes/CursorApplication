@@ -90,7 +90,7 @@ export const CreateApiKeyModal = ({ isOpen, onClose, onCreate }) => {
               />
             )}
             <p className="mt-2 text-[13px] text-gray-600">
-              *If the combined usage of all your keys exceeds your plan's limit, all requests will be rejected.
+              *If the combined usage of all your keys exceeds your plan&apos;s limit, all requests will be rejected.
             </p>
           </div>
         </div>
