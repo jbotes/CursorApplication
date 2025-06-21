@@ -32,7 +32,16 @@ async function validateApiKey(key) {
 
 export async function POST(request) {
   try {
-    const { key, githubUrl } = await request.json();
+    const { githubUrl } = await request.json();
+    // Get API key from request header
+    const key = request.headers.get('x-api-key');
+
+    if (!key) {
+      return NextResponse.json(
+        { error: 'API Key is required' },
+        { status: 401 }
+      );
+    }
 
     // Validate API key first
     const keyValidation = await validateApiKey(key);
