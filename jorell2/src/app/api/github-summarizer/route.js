@@ -81,7 +81,7 @@ export async function POST(request) {
       message: 'GitHub repository summarization endpoint',
       data: {
         githubUrl,
-        summary: 'Repository summarization feature coming soon...',
+        summary: await getReadmeContent(githubUrl),
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
