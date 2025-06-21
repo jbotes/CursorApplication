@@ -34,7 +34,10 @@ export default function ApiPlaygroundPage() {
           data: {
             message: "API Key valid!",
             key: data.key,
-            name: data.name
+            name: data.name,
+            monthly_limit: data.monthly_limit,
+            current_usage: data.current_usage,
+            created_at: data.created_at
           }
         });
         setToastMessage("API Key valid!");
