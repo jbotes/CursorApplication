@@ -161,3 +161,36 @@ export async function GET(request) {
     );
   }
 } 
+
+async function getReadmeContent(githubUrl) {
+  try {
+    // Extract owner and repo from GitHub URL
+    const urlParts = githubUrl.replace('https://github.com/', '').split('/');
+    const owner = urlParts[0];
+    const repo = urlParts[1];
+
+    // Construct raw content URL for README.md
+    const readmeUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/README.md`;
+    
+    // Fetch README content
+    const response = await fetch(readmeUrl);
+    
+    if (!response.ok) {
+      // Try fallback to master branch if main doesn't exist
+      const fallbackUrl = `https://raw.githubusercontent.com/${owner}/${repo}/master/README.md`;
+      const fallbackResponse = await fetch(fallbackUrl);
+      
+      if (!fallbackResponse.ok) {
+        throw new Error('README.md not found in main or master branch');
+      }
+      
+      return await fallbackResponse.text();
+    }
+
+    return await response.text();
+
+  } catch (error) {
+    console.error('Error fetching README:', error);
+    throw new Error('Failed to fetch README content');
+  }
+}
