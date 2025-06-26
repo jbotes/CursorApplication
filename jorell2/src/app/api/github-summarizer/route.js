@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { ChatOpenAI } from '@langchain/openai';
-import { PromptTemplate } from '@langchain/core/prompts';
-import { StringOutputParser } from '@langchain/core/output_parsers';
 
 // Helper function to validate API key
 async function validateApiKey(key) {
@@ -72,20 +69,13 @@ export async function POST(request) {
       );
     }
 
-    // Get README content for summarization
-    const readmeContent = await getReadmeContent(githubUrl);
-    const summary = await generateSummary(readmeContent);
-    const { shortSummary, top3Takeaways } = await generateShortSummaryAndTakeaways(readmeContent);
-
-    // Return the response with AI-generated summary
+    // Return the response
     return NextResponse.json({
       status: 200,
-      message: 'GitHub repository summarization endpoint',
+      message: 'GitHub repository endpoint',
       data: {
         githubUrl,
-        summary: summary,
         readmePreview: await getReadmePreview(githubUrl),
-        shortSummary: shortSummary,
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -136,26 +126,13 @@ export async function GET(request) {
   }
 
   try {
-    // TODO: Implement GitHub repository summarization logic here
-    // This is where you would:
-    // 1. Fetch repository data from GitHub API
-    // 2. Process the repository information
-    // 3. Generate a summary using LangChain/AI
-
-    // Get README content for summarization
-    const readmeContent = await getReadmeContent(githubUrl);
-    const summary = await generateSummary(readmeContent);
-    const { shortSummary, top3Takeaways } = await generateShortSummaryAndTakeaways(readmeContent);
-
-    // Return the response with AI-generated summary
+    // Return the response
     return NextResponse.json({
       status: 200,
-      message: 'GitHub repository summarization endpoint',
+      message: 'GitHub repository endpoint',
       data: {
         githubUrl,
-        summary: summary,
         readmePreview: await getReadmePreview(githubUrl),
-        shortSummary: shortSummary,
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -214,136 +191,5 @@ async function getReadmePreview(githubUrl) {
   } catch (error) {
     console.error('Error fetching readme preview:', error);
     throw new Error('Failed to fetch readme preview');
-  }
-}
-
-async function generateSummary(readmeContent) {
-  try {
-    const prompt = PromptTemplate.fromTemplate(`
-You are an AI that reads GitHub README files.
-
-Based on the README below, do two things:
-1. Write a concise **summary** of what this project is.
-2. Under the heading 'Top 3 Takeaways', list 5–7 **bullet points** of cool or notable facts about the project.
-
-README:
-{readme}
-    `);
-
-    const chain = prompt.pipe(model).pipe(new StringOutputParser());
-    const summary = await chain.invoke({ readme: readmeContent });
-    return summary;
-  } catch (error) {
-    console.error('Error generating summary:', error);
-    
-    // Check for specific OpenAI API errors
-    if (error.message && error.message.includes('401')) {
-      return 'Error: Invalid OpenAI API key. Please check your OPENAI_API_KEY environment variable.';
-    } else if (error.message && error.message.includes('429')) {
-      return 'Error: OpenAI API rate limit exceeded. Please try again later.';
-    } else if (error.message && error.message.includes('500')) {
-      return 'Error: OpenAI API server error. Please try again later.';
-    } else if (!process.env.OPENAI_API_KEY) {
-      return 'Error: OpenAI API key not configured. Please set OPENAI_API_KEY in your environment.';
-    }
-    
-    return 'Unable to generate summary at this time. Please check your OpenAI API configuration.';
-  }
-}
-
-async function generateShortSummaryAndTakeaways(readmeContent) {
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an AI assistant that analyzes GitHub README files and provides concise summaries and key takeaways.'
-          },
-          {
-            role: 'user',
-            content: `Please analyze this GitHub README file and provide:
-
-1. A short summary in 140 words or less
-2. A top 3 key takeaways bullet list
-
-README Content:
-${readmeContent}
-
-Please format your response exactly as follows:
-Short Summary: [your 140-word summary here]
-
-Top 3 Key Takeaways:
-• [first takeaway]
-• [second takeaway]
-• [third takeaway]`
-          }
-        ],
-        temperature: 0.4,
-        max_tokens: 500
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    console.log('OpenAI Response:', content); // Debug log
-
-    // Parse the response to extract summary and takeaways
-    const summaryMatch = content.match(/Short Summary:\s*(.*?)(?=\n\n|Top 3 Key Takeaways:|$)/s);
-    
-    // More flexible regex for takeaways - handles different bullet point formats
-    const takeawaysMatch = content.match(/Top 3 Key Takeaways:\s*((?:[•\-\*]\s*.*?\n?)+)/s);
-    
-    console.log('Summary match:', summaryMatch); // Debug log
-    console.log('Takeaways match:', takeawaysMatch); // Debug log
-
-    const shortSummary = summaryMatch ? summaryMatch[1].trim() : 'Unable to generate summary';
-    let top3Takeaways = takeawaysMatch ? takeawaysMatch[1].trim() : 'Unable to generate takeaways';
-    
-    // If the regex didn't work, try a simpler approach
-    if (top3Takeaways === 'Unable to generate takeaways') {
-      const lines = content.split('\n');
-      const takeawaysLines = [];
-      let foundTakeaways = false;
-      
-      for (const line of lines) {
-        if (line.includes('Top 3 Key Takeaways:')) {
-          foundTakeaways = true;
-          continue;
-        }
-        if (foundTakeaways && (line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))) {
-          takeawaysLines.push(line.trim());
-        }
-        if (foundTakeaways && line.trim() === '') {
-          break;
-        }
-      }
-      
-      if (takeawaysLines.length > 0) {
-        top3Takeaways = takeawaysLines.join('\n');
-      }
-    }
-
-    console.log('Parsed shortSummary:', shortSummary); // Debug log
-    console.log('Parsed top3Takeaways:', top3Takeaways); // Debug log
-
-    return { shortSummary, top3Takeaways };
-  } catch (error) {
-    console.error('Error calling OpenAI API:', error);
-    return {
-      shortSummary: 'Error generating summary',
-      top3Takeaways: 'Error generating takeaways'
-    };
   }
 }
