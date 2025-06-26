@@ -257,7 +257,7 @@ async function generateShortSummaryAndTakeaways(readmeContent) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer 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`
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
         model: 'gpt-4',
