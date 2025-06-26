@@ -86,7 +86,6 @@ export async function POST(request) {
         summary: summary,
         readmePreview: await getReadmePreview(githubUrl),
         shortSummary: shortSummary,
-        top3Takeaways: top3Takeaways,
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -157,7 +156,6 @@ export async function GET(request) {
         summary: summary,
         readmePreview: await getReadmePreview(githubUrl),
         shortSummary: shortSummary,
-        top3Takeaways: top3Takeaways,
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -278,7 +276,7 @@ async function generateShortSummaryAndTakeaways(readmeContent) {
 README Content:
 ${readmeContent}
 
-Please format your response as:
+Please format your response exactly as follows:
 Short Summary: [your 140-word summary here]
 
 Top 3 Key Takeaways:
@@ -298,13 +296,47 @@ Top 3 Key Takeaways:
 
     const data = await response.json();
     const content = data.choices[0].message.content;
+    
+    console.log('OpenAI Response:', content); // Debug log
 
     // Parse the response to extract summary and takeaways
     const summaryMatch = content.match(/Short Summary:\s*(.*?)(?=\n\n|Top 3 Key Takeaways:|$)/s);
-    const takeawaysMatch = content.match(/Top 3 Key Takeaways:\s*((?:•.*?\n?)+)/s);
+    
+    // More flexible regex for takeaways - handles different bullet point formats
+    const takeawaysMatch = content.match(/Top 3 Key Takeaways:\s*((?:[•\-\*]\s*.*?\n?)+)/s);
+    
+    console.log('Summary match:', summaryMatch); // Debug log
+    console.log('Takeaways match:', takeawaysMatch); // Debug log
 
     const shortSummary = summaryMatch ? summaryMatch[1].trim() : 'Unable to generate summary';
-    const top3Takeaways = takeawaysMatch ? takeawaysMatch[1].trim() : 'Unable to generate takeaways';
+    let top3Takeaways = takeawaysMatch ? takeawaysMatch[1].trim() : 'Unable to generate takeaways';
+    
+    // If the regex didn't work, try a simpler approach
+    if (top3Takeaways === 'Unable to generate takeaways') {
+      const lines = content.split('\n');
+      const takeawaysLines = [];
+      let foundTakeaways = false;
+      
+      for (const line of lines) {
+        if (line.includes('Top 3 Key Takeaways:')) {
+          foundTakeaways = true;
+          continue;
+        }
+        if (foundTakeaways && (line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))) {
+          takeawaysLines.push(line.trim());
+        }
+        if (foundTakeaways && line.trim() === '') {
+          break;
+        }
+      }
+      
+      if (takeawaysLines.length > 0) {
+        top3Takeaways = takeawaysLines.join('\n');
+      }
+    }
+
+    console.log('Parsed shortSummary:', shortSummary); // Debug log
+    console.log('Parsed top3Takeaways:', top3Takeaways); // Debug log
 
     return { shortSummary, top3Takeaways };
   } catch (error) {
