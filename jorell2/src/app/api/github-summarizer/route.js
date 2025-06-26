@@ -83,6 +83,8 @@ export async function POST(request) {
         githubUrl,
         summary: "Summary of the repository coming soon...",
         readmePreview: await getReadmePreview(githubUrl),
+        shortSummary: "Coming soon...",
+        top3Takeaways: "Coming soon...",
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -147,6 +149,8 @@ export async function GET(request) {
         githubUrl,
         summary: 'Repository summarization feature coming soon...',
         readmePreview: await getReadmePreview(githubUrl),
+        shortSummary: "Coming soon...",
+        top3Takeaways: "Coming soon...",
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
