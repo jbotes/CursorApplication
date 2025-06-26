@@ -81,7 +81,8 @@ export async function POST(request) {
       message: 'GitHub repository summarization endpoint',
       data: {
         githubUrl,
-        summary: await getReadmeContent(githubUrl),
+        summary: "Summary of the repository coming soon...",
+        readmePreview: await getReadmePreview(githubUrl),
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -145,6 +146,7 @@ export async function GET(request) {
       data: {
         githubUrl,
         summary: 'Repository summarization feature coming soon...',
+        readmePreview: await getReadmePreview(githubUrl),
         apiKeyInfo: {
           name: keyValidation.data.name,
           monthly_limit: keyValidation.data.monthly_limit,
@@ -192,5 +194,16 @@ async function getReadmeContent(githubUrl) {
   } catch (error) {
     console.error('Error fetching README:', error);
     throw new Error('Failed to fetch README content');
+  }
+}
+
+async function getReadmePreview(githubUrl) {
+  try {
+    const readmeContent = await getReadmeContent(githubUrl);
+    const words = readmeContent.split(/\s+/);
+    return words.slice(0, 100).join(' ');
+  } catch (error) {
+    console.error('Error fetching readme preview:', error);
+    throw new Error('Failed to fetch readme preview');
   }
 }
